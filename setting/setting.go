@@ -17,6 +17,42 @@ type Database struct {
 
 var DatabaseSetting = &Database{}
 
+type Unity struct {
+	OrganizationId string
+	ApiKey         string
+}
+
+var UnitySetting = &Unity{}
+
+type Vungle struct {
+	ApiKey string
+}
+
+var VungleSetting = &Vungle{}
+
+type Iron struct {
+	Secretkey    string
+	RefreshToken string
+}
+
+var IronSetting = &Iron{}
+
+type Adx struct {
+	CompanyId string
+	AuthKey   string
+}
+
+var AdxSetting = &Adx{}
+
+type Admob struct {
+	RefreshToken string
+	ClientId     string
+	ClientSecret string
+	PublisherId  string
+}
+
+var AdmobSetting = &Admob{}
+
 var cfg *ini.File
 
 // Setup initialize the configuration instance
@@ -28,6 +64,11 @@ func Setup() {
 	}
 
 	mapTo("database", DatabaseSetting)
+	mapTo("unity", UnitySetting)
+	mapTo("vungle", VungleSetting)
+	mapTo("iron", IronSetting)
+	mapTo("adx", AdxSetting)
+	mapTo("admob", AdmobSetting)
 }
 
 // mapTo map section

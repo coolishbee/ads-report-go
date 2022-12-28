@@ -14,6 +14,11 @@ import "github.com/GoAdminGroup/go-admin/plugins/admin/modules/table"
 //
 // example end
 var Generators = map[string]table.Generator{
-	"unity_ads": GetUnityAds,
+	"tb_ad_corp_unity":    GetUnityAds,
+	"tb_ad_corp_admob":    GetGoogleAdmob,
+	"tb_ad_corp_facebook": GetFacebookAds,
+	"tb_ad_corp_iron":     GetIronSourceAds,
+	"tb_ad_corp_vungle":   GetVungleAds,
+	"tb_ad_corp_adx":      GetAdxAds,
 	// generators end
 }

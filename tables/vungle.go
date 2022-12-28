@@ -18,18 +18,17 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-type UnityAdsResp struct {
-	GameName   string    `json:"source_name"`
-	GameId     string    `json:"source_game_id"`
-	Platform   string    `json:"platform"`
-	Revenue    float32   `json:"revenue_sum"`
-	Impression int       `json:"view_count"`
-	Ecpm       float32   `json:"ecpm"`
-	Date       time.Time `json:"timestamp"`
+type VungleAdsResp struct {
+	GameName  string  `json:"application name"`
+	GameId    string  `json:"application id"`
+	Revenue   float32 `json:"revenue"`
+	ViewCount int     `json:"views"`
+	Ecpm      float32 `json:"ecpm"`
+	Date      string  `json:"date"`
 }
 
-func GetUnityAds(ctx *context.Context) (unityadsTable table.Table) {
-	unityadsTable = table.NewDefaultTable(table.Config{
+func GetVungleAds(ctx *context.Context) (vungleTable table.Table) {
+	vungleTable = table.NewDefaultTable(table.Config{
 		Driver:     db.DriverMysql,
 		CanAdd:     true,
 		Editable:   true,
@@ -42,7 +41,7 @@ func GetUnityAds(ctx *context.Context) (unityadsTable table.Table) {
 		},
 	})
 
-	info := unityadsTable.GetInfo().SetFilterFormLayout(form.LayoutThreeCol)
+	info := vungleTable.GetInfo().SetFilterFormLayout(form.LayoutThreeCol)
 	info.AddField("ID", "id", db.Int).FieldSortable()
 	info.AddField("Name", "game_name", db.Varchar)
 	info.AddField("Game ID", "game_id", db.Varchar)
@@ -52,50 +51,48 @@ func GetUnityAds(ctx *context.Context) (unityadsTable table.Table) {
 	info.AddField("Date", "ad_date", db.Varchar).
 		FieldFilterable(types.FilterType{FormType: form.Date})
 
-	info.AddButton("GET", icon.Send, action.Ajax("ajax_id",
+	info.AddButton("GET", icon.Send, action.Ajax("ajax_vungle",
 		func(ctx *context.Context) (success bool, msg string, data interface{}) {
-			endTime := time.Now().UTC()
-			startTime := endTime.UTC().AddDate(0, 0, -3)
+			endTime := time.Now().UTC().AddDate(0, 0, -1)
+			startTime := endTime.UTC().AddDate(0, 0, -2)
 
-			reqURL := fmt.Sprintf("https://monetization.api.unity.com/stats/v1/operate/organizations/%s?groupBy=game&fields=revenue_sum,view_count&scale=day&start=%s&end=%s&apikey=%s",
-				setting.UnitySetting.OrganizationId,
+			reqURL := fmt.Sprintf("https://report.api.vungle.com/ext/pub/reports/performance?start=%s&end=%s&dimensions=application,date&aggregates=views,revenue,ecpm",
 				startTime.Format("2006-01-02"),
-				endTime.Format("2006-01-02"),
-				setting.UnitySetting.ApiKey)
+				endTime.Format("2006-01-02"))
 
 			client := resty.New()
 			resp, err := client.R().
 				SetHeader("Accept", "application/json").
+				SetAuthToken(setting.VungleSetting.ApiKey).
 				Get(reqURL)
 
 			fmt.Println("  Url      :", resp.Request.URL)
 			fmt.Println("  Error      :", err)
 			//fmt.Println("  Body       :\n", resp)
 
-			unityAdsResp := []UnityAdsResp{}
-			if err := json.Unmarshal(resp.Body(), &unityAdsResp); err != nil {
+			vungleResp := []VungleAdsResp{}
+			if err := json.Unmarshal(resp.Body(), &vungleResp); err != nil {
 				log.Fatalf("error: %v", err)
 			}
 
-			db_unityads := []models.UnityAds{}
-			for _, item := range unityAdsResp {
-				obj := models.UnityAds{
+			db_vungleAds := []models.VungleAds{}
+			for _, item := range vungleResp {
+				obj := models.VungleAds{
 					GameName:   item.GameName,
 					GameId:     item.GameId,
 					Revenue:    item.Revenue,
-					Impression: item.Impression,
+					Impression: item.ViewCount,
 					Ecpm:       item.Ecpm,
-					AdDate:     item.Date.Format("2006-01-02"),
+					AdDate:     item.Date,
 					RegDate:    time.Now(),
 				}
-				db_unityads = append(db_unityads, obj)
+				db_vungleAds = append(db_vungleAds, obj)
 			}
-			models.AddUnityAdsData(db_unityads)
-
+			models.AddVungleAdsData(db_vungleAds)
 			return true, "success", ""
 		}))
 
-	info.SetTable("tb_ad_corp_unity").SetTitle("Unity Ads").SetDescription("Report")
+	info.SetTable("tb_ad_corp_vungle").SetTitle("Vungle Ads").SetDescription("Report")
 
 	return
 }
