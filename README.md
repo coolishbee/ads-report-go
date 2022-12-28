@@ -1,40 +1,55 @@
 
-# GoAdmin Instruction
+# ads-report-go
+[![rcard](https://goreportcard.com/badge/github.com/coolishbee/ads-report-go)](https://goreportcard.com/report/github.com/coolishbee/ads-report-go)
 
-GoAdmin is a golang framework help gopher quickly build a data visualization platform. 
+Advertising revenue report admin using [GoAdmin](https://github.com/GoAdminGroup/go-admin) framework and ads report api.
 
-- [github](https://github.com/GoAdminGroup/go-admin)
-- [forum](http://discuss.go-admin.com)
-- [document](https://book.go-admin.cn)
-
-## Directories Introduction
-
+## Installation
 ```
-.
-├── Makefile            Makefile
-├── adm.ini             adm config
-├── build               binary build target folder
-├── config.yml          config file
-├── go.mod              go.mod
-├── go.sum              go.sum
-├── html                frontend html files
-├── logs                logs
-├── main.go             program entrance file
-├── main_test.go        test file
-├── pages               page controllers
-├── tables              table models
-└── uploads             upload directory
+$ git clone https://github.com/coolishbee/ads-report-go.git
 ```
 
-## Generate Table Model
+## How to run
 
-### online tool
+### Required
 
-visit: http://127.0.0.1:80/admin/info/generate/new
+- MariaDB
 
-### use adm
+### Ready
+
+Create a **database** and import [SQL](https://github.com/coolishbee/ads-report-go/blob/main/sql/ads_report_2022-12-28.sql)
+
+### Conf
+
+You should modify `adm.ini`
 
 ```
-adm generate
+[database]
+Driver = mysql
+Host = 127.0.0.1
+Username = root 
+Port = 
+Password = 
+Database = ads_report
+...
 ```
 
+### Run
+```
+$ cd $GOPATH/src/go-gin-sample
+$ go run main.go
+```
+
+<img src="screenshot/ss01.png" alt="screenshot" />
+
+## Features
+
+- [Unity](https://docs.unity.com/ads/en/MonetizationStatsAPI.html) Ads Report API
+- [Vungle](https://support.vungle.com/hc/en-us/articles/211365828-Publisher-Reporting-API-2-0) Report API
+- [Iron](https://developers.is.com/ironsource-mobile/air/reporting/) Report API
+- [Adx](https://developer.adxcorp.kr/report) Report API
+- [Admob](https://developers.google.com/admob/api/v1/reference/rest/v1/accounts.networkReport/generate) Report API
+
+## TODO
+
+- Facebook
